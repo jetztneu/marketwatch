@@ -23,7 +23,8 @@ def load_data(download_new_data,exchanges,indexes,start_date,end_date):
     indexes = indexes
     data_list = indexes
 
-    start_date = start_date
+    # start_date = start_date
+    start_date = '1900-01-01'
     end_date = end_date
 
     file_out = 'raw_data.xlsx'
@@ -35,6 +36,8 @@ def load_data(download_new_data,exchanges,indexes,start_date,end_date):
         for data in data_list:
             if data == 'BSE':
                 x = '^BSESN'   
+            if data == 'DJI':
+                x = '^DJI'
             if data == 'Hong Kong':
                 x = '^HSI'
             if data == 'Nasdaq100':
@@ -66,20 +69,48 @@ def load_data(download_new_data,exchanges,indexes,start_date,end_date):
     
     return df_raw, file_out, sheet_out
 
-
-download_new_data = 1
-
-exchanges = ['BSE','Hong Kong']
-indexes = ['BSE','Nasdaq100','S&P500','FTSE100','Nifty50','DAX40','Euronext100']
-data_list = indexes
+download_new_data = 0
+if st.sidebar.button('Update Database'):
+    download_new_data = 1
 
 st.sidebar.button('Refresh')
-st.sidebar.button('Update Database')
 
 year = st.sidebar.slider('Year',1950,2024,(2020,2024))
 # st.sidebar.year = st.slider('Year',1950,2024,(2020,2024))
 month = st.sidebar.slider('Month',1,12,(2,3))
 date = st.sidebar.slider('Date',1,31,(5,7))
+
+exchanges = ['BSE','DJI','Hong Kong']
+indexes = ['BSE','DJI','Nasdaq100','S&P500','FTSE100','Nifty50','DAX40','Euronext100']
+
+data_list = []
+
+st.sidebar.text('Stock Exchanges')
+if st.sidebar.checkbox('Bombay Stock Exchange'):
+    data_list.append('BSE')
+if st.sidebar.checkbox('Dow Jones Industrial'):
+    data_list.append('DJI')
+if st.sidebar.checkbox('Hong Kong'):
+    data_list.append('Hong Kong')
+
+st.sidebar.text('Indexes')
+if st.sidebar.checkbox('Nasdaq 100'):
+    data_list.append('Nasdaq100')
+if st.sidebar.checkbox('Nifty 50'):
+    data_list.append('Nifty50')
+if st.sidebar.checkbox('S&P500'):
+    data_list.append('S&P500')
+if st.sidebar.checkbox('FTSE100'):
+    data_list.append('FTSE100')
+if st.sidebar.checkbox('DAX40'):
+    data_list.append('DAX40')
+if st.sidebar.checkbox('Euronext100'):
+    data_list.append('Euronext100')
+
+
+# data_list = indexes
+
+
 
 s_year, e_year = year
 s_month, e_month = month
