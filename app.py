@@ -73,29 +73,41 @@ def load_data(download_new_data,exchanges,indexes,start_date,end_date):
 download_new_data = 0
 if st.sidebar.button('Update Database'):
     download_new_data = 1
+    st.sidebar.write('Last updated on '+str(datetime.today()))
 
 st.sidebar.button('Refresh')
 
 gain_toggle = st.sidebar.toggle('Gain %')
 
 year = st.sidebar.slider('Year',1991,2024,(2020,2024))
-# st.sidebar.year = st.slider('Year',1950,2024,(2020,2024))
-month = st.sidebar.slider('Month',1,12,2)
-date = st.sidebar.slider('Date',1,31,5)
+# month = st.sidebar.slider('Month',1,12,2)
+# date = st.sidebar.slider('Date',1,31,5)
 
-exchanges = ['BSE','DJI','Hong Kong']
+
+col1s, col2s = st.sidebar.columns(2)
+with col1s:
+    month = st.sidebar.number_input('Month',1,12,1,1)
+with col2s:
+    date = st.sidebar.number_input('Date',1,31,1,1)
+
+
+exchanges = ['BSE','DJI','Hong Kong','Dax40']
 indexes = ['Nasdaq100','S&P500','FTSE100','Nifty50','DAX40','Euronext100']
 
 indian_market = ['BSE','Nifty50']
 world_market = ['DJI','Nasdaq100','S&P500','FTSE100','DAX40','Euronext100']
 
 data_list = []
+# indian_market = []
+# world_market = []
 
 st.sidebar.text('Stock Exchanges')
 if st.sidebar.checkbox('Bombay Stock Exchange'):
     data_list.append('BSE')
 if st.sidebar.checkbox('Dow Jones Industrial'):
     data_list.append('DJI')
+if st.sidebar.checkbox('DAX40'):
+    data_list.append('DAX40')
 if st.sidebar.checkbox('Hong Kong'):
     data_list.append('Hong Kong')
 
@@ -108,8 +120,7 @@ if st.sidebar.checkbox('S&P500'):
     data_list.append('S&P500')
 if st.sidebar.checkbox('FTSE100'):
     data_list.append('FTSE100')
-if st.sidebar.checkbox('DAX40'):
-    data_list.append('DAX40')
+
 if st.sidebar.checkbox('Euronext100'):
     data_list.append('Euronext100')
 
@@ -122,14 +133,13 @@ s_date, e_date = date, date
 s_month, e_month, s_date, e_date = "{:02d}".format(s_month), "{:02d}".format(e_month), "{:02d}".format(s_date), "{:02d}".format(e_date)
 
 
-# start_date = '1986-01-01'
 start_date = str(s_year)+'-'+str(s_month)+'-'+str(s_date)
 end_date = str(e_year)+'-'+str(e_month)+'-'+str(e_date)
 
 abs_gain_date = start_date
 
 # Calculate the moving average with a window size of 3
-window_mov_avg = st.sidebar.slider('Average over days:',0,100,3)
+window_mov_avg = st.sidebar.slider('Average over days:',1,100,1)
 
 
 
@@ -145,19 +155,20 @@ df_raw_re = pd.DataFrame()
 
 
 df_raw_main, file_out, sheet_out = load_data(download_new_data,exchanges,indexes,start_date,end_date)
+df_raw_main.iloc[0] = df_raw_main.iloc[0].combine_first(df_raw_main.dropna().iloc[0])
 df_raw = df_raw_main.loc[start_date:end_date]
+df_raw.iloc[0] = df_raw.iloc[0].combine_first(df_raw.dropna().iloc[0])
+
 
 ymd_abs_gain_start_val = abs_gain_date.split('-')[0]+abs_gain_date.split('-')[1]+abs_gain_date.split('-')[2]
 
 
 for data in data_list:
-    print(data)
     df_normperyear[data] = df_raw[data]/df_raw.groupby('Year')[data].transform('max')
     df_normmax[data] = df_raw[data]/max(df_raw[data].dropna())
     df_normmax[data] = df_normmax[data].rolling(window=window_mov_avg).mean()
     df_mav[data] = df_raw[data].rolling(window=window_mov_avg).mean()
     df_diff[data] = np.diff(df_raw[data])
-#    df_gain[data] = ((df_raw[data] - df_raw.query('ymd==@ymd_abs_gain_start_val')[data][0])/df_raw.query('ymd==@ymd_abs_gain_start_val')[data][0]*100).rolling(window=window_mov_avg).mean()
     df_gain[data] = ((df_raw[data] - df_raw[data][0])/df_raw[data][0]*100).rolling(window=window_mov_avg).mean()
     df_raw_re[data] = df_raw[data]
 
@@ -213,7 +224,7 @@ with col2:
 
 
 
-if st.sidebar.toggle('Data follow chart'):
+if st.sidebar.toggle('Table shows chart data'):
     st.dataframe(df_raw_re)
 else:
     st.dataframe(df_raw_main)
