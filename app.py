@@ -224,13 +224,13 @@ with col2:
 
 
 
-if st.sidebar.toggle('Table shows chart data'):
-    st.dataframe(df_raw_re)
-else:
-    st.dataframe(df_raw_main)
+# if st.sidebar.toggle('Table shows chart data'):
+#     st.dataframe(df_raw_re)
+# else:
+#     st.dataframe(df_raw_main)
 
 
 # st.dataframe(df_gain)
 fin = time.time()
 st.write('Took ',np.round(fin-t0,2),' s to load.')
-st.write(np.random.randint(0,10))
+# st.write(np.random.randint(0,10))
