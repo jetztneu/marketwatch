@@ -62,9 +62,9 @@ def load_data(download_new_data,exchanges,indexes,start_date,end_date):
     else:
         df_raw = pd.read_excel(file_out,sheet_out)
 
-    df_raw = df_raw.reset_index()
-    df_raw['Year'], df_raw['Month'], df_raw['Date_n'] = df_raw['Date'].astype(str).str.split('-', 2).str
-    df_raw['ymd']=df_raw['Year'].astype(str)+df_raw['Month'].astype(str)+df_raw['Date_n'].astype(str)
+#    df_raw = df_raw.reset_index()
+#    df_raw['Year'], df_raw['Month'], df_raw['Date_n'] = df_raw['Date'].astype(str).str.split('-', 2).str
+#    df_raw['ymd']=df_raw['Year'].astype(str)+df_raw['Month'].astype(str)+df_raw['Date_n'].astype(str)
     # df_raw['ymd'] = df_raw['ymd'].astype(int)
     df_raw = df_raw.set_index('Date')
     
@@ -164,7 +164,7 @@ ymd_abs_gain_start_val = abs_gain_date.split('-')[0]+abs_gain_date.split('-')[1]
 
 
 for data in data_list:
-    df_normperyear[data] = df_raw[data]/df_raw.groupby('Year')[data].transform('max')
+    # df_normperyear[data] = df_raw[data]/df_raw.groupby('Year')[data].transform('max')
     df_normmax[data] = df_raw[data]/max(df_raw[data].dropna())
     df_normmax[data] = df_normmax[data].rolling(window=window_mov_avg).mean()
     df_mav[data] = df_raw[data].rolling(window=window_mov_avg).mean()
